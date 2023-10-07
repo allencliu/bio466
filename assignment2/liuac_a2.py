@@ -326,6 +326,21 @@ def cpg_island(sequence):
     # Return a dictionary containing information about identified CpG islands.
     return cpg_dict
 
+def reverse_complement(sequence):
+    """Calculate the reverse complementary DNA strand.
+
+    Args:
+        sequence (str): The input DNA sequence.
+
+    Returns:
+        str: The reverse complementary DNA strand.
+    """
+    complement = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
+    reverse_seq = sequence[::-1]
+    reverse_comp_seq = ''.join(complement[base] for base in reverse_seq)
+    return reverse_comp_seq
+
+
 def codon_profile(sequence):
     """Generate a codon profile for a given DNA sequence.
 
@@ -378,8 +393,6 @@ def codon_profile_print(codon_dict):
                 # Check if the codon exists in the dictionary
                 if codon in codon_dict:
                     count = codon_dict[codon]
-                else:
-                    count = "_"
 
                 # Append the codon and count to the row
                 row += f'{codon}={count}\t'
@@ -394,7 +407,76 @@ def codon_profile_print(codon_dict):
                     codons_printed = 0
         print()
 
+def translation(dna_sequence):
+    """Translate a DNA sequence into a protein sequence.
 
+    Args:
+        dna_sequence (str): The input DNA sequence to be translated.
+
+    Returns:
+        str: The resulting protein sequence.
+    """
+    trans_dic = {
+    'UUU': 'F', 'UUC': 'F', 'UUA': 'L', 'UUG': 'L',
+    'CUU': 'L', 'CUC': 'L', 'CUA': 'L', 'CUG': 'L',
+    'AUU': 'I', 'AUC': 'I', 'AUA': 'I', 'AUG': 'M',
+    'GUU': 'V', 'GUC': 'V', 'GUA': 'V', 'GUG': 'V',
+    'UCU': 'S', 'UCC': 'S', 'UCA': 'S', 'UCG': 'S',
+    'CCU': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
+    'ACU': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T',
+    'GCU': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
+    'UAU': 'Y', 'UAC': 'Y', 'UAA': '*', 'UAG': '*',
+    'CAU': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q',
+    'AAU': 'N', 'AAC': 'N', 'AAA': 'K', 'AAG': 'K',
+    'GAU': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E',
+    'UGU': 'C', 'UGC': 'C', 'UGA': '*', 'UGG': 'W',
+    'CGU': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R',
+    'AGU': 'S', 'AGC': 'S', 'AGA': 'R', 'AGG': 'R',
+    'GGU': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'}
+    rna_sequence = dna_sequence.replace('T', 'U')
+    protein = []
+    result = " "
+    for i in range(0, len(rna_sequence)-2, 3):
+        protein.append(trans_dic[rna_sequence[i:i+3]])
+    result = result.join(protein)
+    return result
+    
+def translation_6_frame(dna_sequence):
+    """_summary_
+
+    Args:
+        dna_sequence (_type_): _description_
+    """
+    protein_1 = translation(dna_sequence)
+    protein_2 = translation(dna_sequence[1:])
+    protein_3 = translation(dna_sequence[2:])
+    rev_comp = reverse_complement(dna_sequence)
+    protein_4 = translation(rev_comp)
+    protein_5 = translation(rev_comp[1:])
+    protein_6 = translation(rev_comp[2:])
+    return (protein_1, protein_2, protein_3, protein_4, protein_5, protein_6)
+    
+def print_seq_fragment(seq_fragment, start, end):
+    seq_length = end - start + 1
+    sequence = seq_fragment[start : end + 1]
+    proteins = translation_6_frame(sequence)
+    
+    print(proteins[0])
+    print(sequence)
+    for i in range(seq_length):
+        print("|", end="")
+    print()
+    print(
+        f"<{start}{'-' * (end - start - len(str(start)) - len(str(end)) - 1)}{end}>"
+    )
+    for i in range(seq_length):
+        print("|", end="")
+    print()
+
+    # Print the sequence
+    print(reverse_complement(sequence)[::-1], end="\n\n")
+    analysis(sequence)
+    
 
 def analysis(sequence):
     # Perform various analyses based on configuration settings.
@@ -428,10 +510,9 @@ def analysis(sequence):
             print("".join([str(key), "=", cpg[key]]), end=" ")
         print("\n")
         
-    if config_dict["codonProfile[Y|N]"] == "Y":
-        codon_profile_print(codon_profile(sequence))
+    if "codonProfile[Y|N]" in config_dict and config_dict["codonProfile[Y|N]"] == "Y":
+        codon_profile_print(codon_profile(sequence))      
         
-
 
 def inquiry(config_dict, fasta_list):
     """Perform various analyses on selected sequences based on configuration settings.
@@ -464,24 +545,29 @@ def inquiry(config_dict, fasta_list):
         if start < 0 or end > len(fasta_list[2][seq]) or start > end:
             print(f"Invalid fragment for {fasta_list[0][seq]}!", end="\n\n")
         else:
+            # Extract the sequence fragment.
+            sequence = fasta_list[2][seq][start : end + 1]
+            
             print(f">{fasta_list[0][seq]}", end="\n\n")
             print(
                 f"The selected fragment has a length of {seq_length} nucleotides:",
                 end="\n\n",
             )
 
-            # Print a representation of the sequence fragment with start and end markers.
-            print(
-                f"<{start}{'-' * (end - start - len(str(start)) - len(str(end)) - 1)}{end}>"
-            )
-            for i in range(seq_length):
-                print("|", end="")
-            print()
+            if "translation6Frames[Y|N]" in config_dict and config_dict["translation6Frames[Y|N]"] == "Y":
+                print_seq_fragment(fasta_list[2][seq], start, end)
+            else:
+                # Print a representation of the sequence fragment with start and end markers.
+                print(
+                    f"<{start}{'-' * (end - start - len(str(start)) - len(str(end)) - 1)}{end}>"
+                )
+                for i in range(seq_length):
+                    print("|", end="")
+                print()
 
-            # Extract the sequence fragment.
-            sequence = fasta_list[2][seq][start : end + 1]
-            print(sequence, end="\n\n")
-            analysis(sequence)
+                # Print the sequence
+                print(sequence, end="\n\n")
+                analysis(sequence)
 
 
 if __name__ == "__main__":
