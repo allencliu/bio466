@@ -1,0 +1,74 @@
+**********************************
+Sequence Alignment using Align
+
+April, 2008
+
+Richard M. Salter
+Computer Science Department
+Oberlin College
+Oberlin, OH 44074
+rms@cs.oberlin.edu
+
+Supported by NSF CCLI Phase II Grant DUE 0618252
+c. 2008, Richard M. Salter
+**********************************
+
+This instructional module can be used as a laboratory exercise in a
+supervised scheduled lab, or as an "off-line" student assignment. The
+content is closely coupled with the Align instructional application.
+Documentation for Align can be accessed from the program's Help menu,
+or separately from the application at help.html in the Doc folder.
+(Installation instructions for Align are contained in this
+documentation.) Students should familiarize themselves with the basics
+of Align operation before working on the module.
+
+The module is distributed in four PDF file as Parts I - IV.
+
+    Part I introduces sequence alignment.
+    Part II describes the basic dynamic programming algorithm.
+    Part III discusses the scoring schemes used in sequence alignment.
+    Part IV considers semi-global and local variations of the basic
+    algorithm.
+
+Each part contains worked-out examples and several exercises with
+solutions. Please feel free to add your own exercises to the ones
+distributed here.
+
+Some students may find it easier to have printed versions of the
+modules on their desks when working with Align on their computers.
+Students may also open several instances of Align when working
+exercises that require comparisons.
+
+Development in the module closely follows the material on sequence
+alignment in the textbook Fundamental Concepts of Bioinformatics by
+Krane & Raymer. Other online resources follow:
+
+Dynamic Programming Tutorial
+http://www.avatar.se/molbioinfo2001/dynprog/dynamic.html
+
+Needleman-Wunsch algorithm - Wikipedia, the free encyclopedia
+http://en.wikipedia.org/wiki/Needleman-Wunsch_algorithm
+
+Needleman-Wunsch, step-by-step
+http://www.rosalindfranklin.edu/cms/biochem/Walters/CABR/nw.html
+
+Needleman-Wunsch Algorithm
+http://www.maths.tcd.ie/~lily/pres2/sld003.htm
+
+Smith-Waterman algorithm - Wikipedia, the free encyclopedia
+http://en.wikipedia.org/wiki/Smith-Waterman_algorithm
+
+Computers and the Human Genome Project: Smith-Waterman Algorithm
+http://cse.stanford.edu/class/sophomore-college/projects-00/computers-and-the-hgp/smith_waterman.html
+
+Smith-Waterman Algorithm
+http://www.maths.tcd.ie/~lily/pres2/sld009.htm
+
+Please email any questions or comments to rms@cs.oberlin.edu
+
+ACKNOWLEDGMENT
+
+The author would like to express his deep appreciation to Professor
+Robin Salter of the Oberlin College Biology Department for her
+invaluable assistance in the preparation of these materials.
+

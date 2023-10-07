@@ -1,0 +1,29 @@
+###########################
+##   File Name: config.txt
+###########################  
+Programmer=John Smith
+Email=jsmith@miamioh.edu
+SeqFileName=Sequence1.fasta
+
+###########################
+##   1. Display Mode
+###########################
+ViewSequenceInFastaFormat[Y|N]=N
+DoYouNeedSpaceSeperator[Y|N]=Y
+NucleotidesPerLine[50|100]=100
+  
+###########################
+##   2. Analysis Mode
+###########################
+nucleotideCounter[Y|N]=Y
+gcContent[Y|N]=Y
+dinucleotideProfil[Y|N]=Y
+CpGIsland[Y|N]=Y
+
+###########################
+##   3. Inquiry Mode
+###########################
+SelectedSeqs=2,4
+SeqFragmentStartPosition=58
+SeqFragmentEndPostion=99
+

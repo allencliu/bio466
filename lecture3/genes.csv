@@ -1,0 +1,5 @@
+name,seq,length,origin
+geneA,ATATCATACCCATGA,15,human
+geneB,AAACGATACGAGACAAA,17,human
+geneC,TACAGGGCCAGACAGACAGG,20,rice
+geneD,AAATGCTCGGAGAGAGAG,16,mouse

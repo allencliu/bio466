@@ -1,0 +1,196 @@
+#> Slide 10
+
+>>> x='ATCG'
+>>> for y in x:
+...	print(y)
+>>> y
+>>> x
+
+>>> x='ATCG'
+>>> for y in range(4):
+...	print(y)
+>>> y
+>>> x
+
+#> Slide 12
+
+>>> for x in range(4):
+...	print(x)
+
+#> Slide 13
+
+x= 'ATCGGCTA'
+
+for a in range(0,len(x)+1):
+	print(x[:a])
+
+for a in range(0,len(x)-1,2):
+	print(a, x[a])
+
+for a in range(len(x)-1,-1,-1):
+	print(a, x[a]) 
+
+
+for a in range(len(x)-1,0,-2):
+	print(a,x[a])
+
+
+#> Slide 15
+
+>>> x = 0
+>>> while (x < 4):
+... 	print(x)
+... 	x=x+1
+
+x = 0
+while True:
+    if x < 4:
+        print(x)
+    else:
+        break
+    x=x+1
+
+x= 'ATCGGCTA'
+for a in range(0,len(x)+1):
+    if (a==5):
+        break
+    print(x[:a])
+
+
+#> Slide 18
+
+>>> inputFile=open("Seq.Fasta","r")
+>>> inputFile
+>>> type(inputFile)
+>>> inputFile.read(5)
+>>> inputFile.read(10)
+>>> inputFile.readline()
+>>> inputFile.readline()
+>>> inputFile.readlines()
+>>> inputFile.read()
+>>> inputFile=open("Seq.Fasta","r")
+>>> inputFile.read()
+
+#> Slide 19
+
+>>> inputFile=open("Seq.Fasta","r")
+>>> for line in inputFile:
+    	    print(line)  
+>>> inputFile.close()
+
+#> Slide 20
+
+>>> outputFile=open("Seq.Fasta","w")
+>>> string=“ATGC"
+>>> outputFile.write(string)
+>>> outputFile.write(("\n")
+>>> outputFile.write(string)
+
+#> Slide 21
+
+>>> file_handle=open('readme.txt', 'r+')
+>>> file_handle
+>>> type(file_handle)
+>>> file_handle.write('>Seq2 \nCCCCATGCGGGG\n')
+
+>>> file_handle=open('seqAtest.fas', 'r+')
+>>> file_handle
+>>> file_handle.append('>Seq2 \nATGC\n')
+
+#> Slide 23
+
+file_handle=open('SeqA.fas','r')
+file_handle.read()
+
+file_handle=open('seqA.fas','r')
+result=file_handle.read()
+print(result)
+
+file_handle.close()
+
+#> Slide 24
+
+file_handler=open('SeqB.fas','r')
+my_file = file_handler.read()
+name = my_file.split('\n')[0][1:]
+sequence = ''.join(my_file.split('\n')[1:])
+print('The name is : ({0})'.format(name))
+print('The sequence is: ({0})'.format(sequence))
+
+sequence = ''
+with open('SeqB.fas') as fh:
+    name = fh.readline()[1:-1]
+    for line in fh:
+        sequence += line.replace('\n','')
+print('The name is : {0}'.format(name))
+print('The sequence is: {0}'.format(sequence))
+
+#> Slide 25
+
+# Filename:cvsAvgLen.py
+total_len = 0
+with open('genes.csv') as fh:
+    next(fh)
+    print(fh)
+    for n, line in enumerate(fh):
+        data = line.split(',')
+        print(n,data)
+        total_len += int(data[2])
+print(total_len/n)
+
+#> Slide 26
+
+import csv
+total_len=0
+lines = csv.reader(open('genes.csv'))
+next(lines)  # Get rid of title line
+for n, line in enumerate(lines):
+    total_len += int(line[2])
+print(total_len / n)
+
+
+import csv
+data=list(csv.reader(open('genes.csv')))
+data[0][2]
+data[1][2]
+data[2][0]
+
+#> Slide 27
+
+# Define a function sum()
+
+def sum(a,b):  
+	return a + b  
+
+# Create a 'Summation' class with a method sum()
+class Summation(object):  
+	def sum(self, a, b):    
+		self.sum = a + b    
+		return self.sum
+
+print(sum(4,5))
+p=Summation()
+print(p.sum(6,8))
+
+#> Slide 28
+
+str="this is string example....wow!!!“
+str.startswith('this’)
+str.startswith('it',2,4)
+str.startswith('this',0,4)
+
+str="this is string example....wow!!!"
+suffix="wow!!!"
+str.endswith(suffix)
+str.endswith(suffix,20)
+
+#> Slide 29
+
+str1 = "this is string example....wow!!!"
+str2 = "exam“
+str1.find(str2)
+str1.find(str2, 10)
+str1.find(str2, 40)
+
+
+

@@ -1,0 +1,355 @@
+L04.PythonBasics.pptx
+
+#> Slide 3 (try and show)
+
+>>> 'John Smith,5555-2333,hi@example.com'.split(',')
+>>> A='John Smith,5555-2333,hi@example.com'.split(',')
+>>> A
+>>> type(A)
+
+
+#> Slide 4 (talk only)
+
+>>> firstList=[1,2,3,4,5]
+>>> secondList=[1,'A',3,4,5]
+>>> third_list=[]
+>>> fourth_list=[1,[1,'A',3,4,5],'JohnSmith']
+
+#> Slide 5 (talk only)
+
+# Sequence Counter
+>>> Seq = "AATGCCCTTC" 
+>>> A_Count = Seq.count("A") 
+>>> T_Count = Seq.count("T") 
+>>> C_Count = Seq.count("C") 
+>>> G_Count = Seq.count("G") 
+
+# Create list named overall 
+>>> overall = [A_Count, T_Count, C_Count, G_Count]
+print (overall)
+# Label overall to another list object (or update the list)
+>>> overall = ["A", A_Count, "T", T_Count, "C", C_Count, "G", G_Count]
+# Print overall
+>>> print(overall)
+>>> print(type(overall))
+
+>>> overall = [["A", A_Count], ["T", T_Count], ["C", C_Count], ["G", G_Count]]
+# Print overall
+>>> print(overall)
+>>> print(type(overall))
+
+#> Slide 6 (try and show)
+
+>>> Mylist=['ATG', 'CCC', 'GGG', 'AAA', 'TTT', 'GTA']
+Mylist[0][1]
+Mylist[2]
+Mylist[1:3]
+Mylist[2:4]
+Mylist[:4]
+Mylist[2:]
+
+Mylist[-1][2]
+Mylist[-2:]
+Mylist[-4:]
+Mylist[:-2]
+Mylist[:]
+
+#> Slide 7 (try and show)
+
+Mylist=[10,20,30,40,50,60,70,80]
+Mylist[-4:-1]
+Mylist[-1:-4]
+MyList[1:4]
+Mylist[4:1]
+Mylist[2:-1]
+Mylist[-1:2]
+
+Mylist[-4:-1:-1]
+Mylist[-1:-4:-1]
+MyList[1:4:-1]
+Mylist[4:1:-1]
+Mylist[2:-1:-1]
+Mylist[-1:2:-1]
+
+#> Slide 8 (talk only)
+
+>>> List=[1,2,3,4,5,6]
+>>> List[2]=30
+>>> List[2:5]=['A', 0, True]
+>>> List=List+[7]
+>>> List=List+[8,9]
+>>> del(List[0])
+
+#> Slide 10 (try and show)
+
+>>> seq = "atggctaggc"
+>>> list(seq)
+
+>>> samples = ["AT"]*6
+>>> samples
+
+>>> a = [0, 1, 2, 3, 4, 5]
+>>> [3*x for x in a]
+
+#> Slide 11 (talk only)
+
+>>> [1,2,3]+[4,5,6]
+>>> first_list=[1,2,3,4,5]
+>>> first_list.append(99)
+>>> first_list.insert(2,50)      
+>>> first_list.extend([6,7,8])    
+
+#> Slide 12 (talk only)
+
+>>> list=[1,2,3,1]
+>>> del(list[0])
+>>> list.remove(1)  	
+>>> list.pop()      
+>>> list.count(1)
+>>> list.reverse()
+>>> list.sort()
+>>> list.index(6)
+>>> list.insert(0,8)   
+
+#> Slide 13 (try and show)
+
+>>> point = (23, 56, 11)
+>>> one_tuple = ()
+>>> one_element_tuple = (3, )
+
+#> Slide 14 (talk only)
+
+>>> point = (23, 56, 11)
+>>> del(point)
+>>> point[0]
+
+#> Slide 15 (talk only)
+
+>>> seq1 = ('M', 'R', 'V')
+>>> seq1[0]
+>>> seq1[1]
+>>> seq2 = 'MRV'
+>>> seq2[0]
+>>> seq2[1]
+>>> seq3 = ['M', 'R', 'V']
+>>> seq3[0]
+>>> seq3[1]
+
+#> Slide 16 (talk only)
+
+>>> seqdata1 = ('MRVLLVALALLA', 12, '5FE9EEE8EE2DC2C7')
+>>> seqdata1[0][5]
+>>> seqdata2 = ['MRVLLVALALLA', 12, '5FE9EEE8EE2DC2C7']
+>>> seqdata2[0][5]
+
+#> Slide 17 (talk only)
+
+>>> my0="Python"
+>>> my1=('P', 'y', 't', 'h', 'o', 'n')
+>>> my2=['P', 'y', 't', 'h', 'o', 'n'] 
+>>> my0[1:5:2]
+>>> my1[1:5:2]
+>>> my2[1:5:2]
+
+Seq=‘ATGC’
+Seq[::-1]
+
+#> Slide 18 (talk only)
+
+>>> point1 = (23, 56, 11) 
+>>> 11 in point1
+>>> point2 = [23, 56, 11]
+>>> 11 in point2
+>>> point3 = '23 56 11'
+>>> '11' in point3
+
+#> Slide 19 (try and show)
+
+>>> point1 = (23, 56, 11) 
+>>> len(point1);max(point1);min(point1)
+>>> point2 = [23, 56, 11]
+>>> len(point2);max(point2);min(point2) 
+>>> point3 = '23 56 11'
+>>> len(point3);max(point3);min(point3)
+
+#> Slide 21 (try and show)
+
+>>> counter = [('A',2), ('T',3), ('G',5), ('C',6)]
+>>> ncounter1 = dict(counter)
+>>> ncounter2 = dict(A=2, T=3, G=4, C=5)
+>>> ncounter3 = {}
+>>> ncounter3['A'] = 7
+>>> ncounter3['T'] = 8
+
+>>> ncounter4={'A':2, 'T':3, 'G':5, 'C':6}
+
+
+#> Slide 22 (try and show)
+
+>>> MyD={'A':30, 'T':42, 'G':12, 'C':12}
+>>> len(MyD)
+>>> MyD.keys()	# a copy of MyD's list of keys
+>>> MyD.values()	# a copy of MyD's list of values
+>>> list(MyD.keys()	#  You will get a real list, not dict_keys object 
+>>> list(MyD.values()
+>>> MyD.items()	# a copy of MyD's list of (key, value) pairs
+
+>>> MyD['A']		# retrieve value for a given key
+>>> MyD['T']
+>>> MyD['N']=12	# add a new element by a new key with its value
+>>> MyD['N']=2	# update an element by assignment of the existing key  
+>>> del(MyD['N'])        # delete an item in a dictionary
+>>> MyD1=MyD.copy()	# Generate a new list that has the same content of a given list
+>>> MyD1.clear()	# remove all items from a dictionary, resulting in an empty dict
+print(MyD)
+print(MyD1)
+
+
+#> Slide 23 (try and show)
+
+>>> MyD={'A':30, 'T':42, 'G':12, 'C':12}
+>>> MyD1=MyD.copy()
+>>> 'A' in MyD1
+>>> 'A' not in MyD1
+>>> MyD.get('A','no A was found! ')
+>>> MyD.get('N','no N was found! ')
+
+
+>>> MyD1.pop('A')
+>>> Value=MyD1.pop('C')
+>>> Value
+>>> type(Value)
+
+#> Slide 24 (try and show)
+
+>>> from collections import OrderedDict
+>>> d = OrderedDict()			# create a new obj
+>>> d['a'] = 'A'
+>>> d['c'] = 'C'
+>>> d['b'] = 'B'
+>>> d
+>>> e=OrderedDict([('c', 'C'), ('b', 'B'), ('a', 'A')])
+>>> e
+
+#> Slide 25 (try and show)
+
+first_set = set()
+first_set.add('CP0140.1')
+first_set.add('XJ8113.5')
+first_set.add('EF3616.3')
+first_set
+
+
+{2*x for x in [1,2,3]}
+
+{2*x for x in [1,1,2,2,3,3]}
+
+
+#> Slide 26 (try and show)
+
+first_set = {'CP0140.1','XJ8113.5','EF3616.3'}
+other_set = {'EF3616.3'}
+common = first_set.intersection(other_set)
+common
+
+first_set = {'CP0140.1','XJ8113.5','EF3616.3'}
+other_set = {'AB7416.2'}
+first_set.union(other_set)
+first_set | other_set
+
+#> Slide 27 (try and show)
+
+first_set.difference(other_set)
+first_set - other_set
+other_set - first_set
+
+first_set
+list(first_set)
+
+#> Slide 28 (try and show)
+
+SeqA={'A':30, 'T':42, 'G':12, 'C':12}
+SeqB={'A':31, 'T':40, 'G':12, 'C':12}
+
+for x in SeqA.keys(): 
+	print(SeqA[x],SeqB[x])
+
+for x in SeqA.values(): 
+	print(x)
+
+for x,y in SeqA.items(): 
+	print(y, SeqA[x],SeqB[x])
+
+for item in SeqA.items():
+	print(item)
+
+#> Slide 29 (try and show)
+
+# Loop through enumerate()
+# enumerate(iterable) will return both index and value
+
+myStr='ATGC'
+for i, j in enumerate(myStr):
+    print(i,j)
+    
+myList=[1,2,3,4,5]
+for x, y in enumerate(myList):
+    print(x,y)
+
+myTuple=(10,20,30,40,50)
+for y, x in enumerate(myTuple):
+    print(y,x)
+    
+mySet={3,3,5,5,6,6,6,7}
+for m, n in enumerate(mySet):
+    print(m,n)
+
+
+for j, i in enumerate(myDict):
+    print(j,i,myDict[i])
+
+#> Slide 30 (try and show)
+
+# Loop through range()
+myStr='ATGC'
+for i in range(0,len(myStr)):
+    print(i,myStr[i])
+    
+myList=[1,2,3,4,5]
+for x in range(0, len(myList)):
+    print(x,myList[x])
+
+myTuple=(10,20,30,40,50)
+for y in range(0,len(myTuple)):
+    print(y,myTuple[y])
+    
+mySet={3,3,5,5,6,6,6,7}	#{3, 5, 6, 7}
+myList=list(mySet) 	# set does not support indexing
+for m in range(0,len(myList)):
+    print(m,myList[m])
+                      # dict does not support indexing
+myDict={'A':5,'T':3,'G':8,'C':10} 
+myKey=list(myDict.keys())
+for i in range(0,len(myKey)):
+    print(i,myKey[i],myDict[myKey[i]])
+
+#> Slide 31 (PyCharm: try and show)
+
+# Filename: dictionary_complex.py
+
+MyD={}
+MyD['This']=[0,1,2,3]
+MyD['is']=('c','o','o','l')
+MyD['Cool']={0:'c',1:'o',2:'o',3:'l'}
+
+for item in MyD.items():
+    print(item)
+
+for key, value in MyD.items():
+    print(key,value)
+    if key == 'This' or key=='is':
+        for x, y in enumerate(value):
+            print("Index=[{0}] Value=[{1}]".format(x, y))
+    else:
+        for x, y in value.items():
+            print(x, y, MyD['Cool'][x])

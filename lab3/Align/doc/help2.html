@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<!-- This file was built using HtX, c. 1994-1997 by Richard M. Salter -->
+
+<head>
+
+<a name="@l12"><title>Getting Started</title></a>
+<basefont size=3>
+
+</head>
+<body BGCOLOR="#fffff5"         leftMargin="20">
+
+
+
+<h3>Chapter: Getting Started</h3> 
+
+                <a href="help.html#@c10"><img src="./contents.gif" align=center alt="up" border=0>   &#160;<b>Contents</b></a>    &#160;  &#160;  &#160;  &#160;  &#160;  &#160;  &#160;  &#160;  &#160;  &#160;    <a href="help1.html#@l11"><img src="./back.gif" align=center alt="back" border=0>   &#160;<b>Installatio...</b></a>    &#160;  &#160;  &#160;  &#160;  &#160;  &#160;  &#160;  &#160;  &#160;  &#160;    <a href="help3.html#@l13"><img src="./forward.gif" align=center alt="forward" border=0>   &#160;<b>Commands...</b></a><hr>   Launching <i>Align</i> for the first time will load a short pair of DNA sequences, with a simple initial configuration (Match Score: 1.00, Gap Penaly: -1.00, Mismatch Score and Origination Penaly: 0.00).<p> 
+
+<h3>Initiating Sequence Alignment Actions</h3> <ol ><li >Select one of the three pairwise sequence alignment algorithms (Needleman/Wunsch Global Alignment, Needleman/Wunsch Semiglobal Alignment, Smith/Waterman Local Alignment). <li >Click <i>Start</i> in the Control Panel; <li >Select Operating Mode (described below); <li >Click <i>Evaluate</i>. </ol> <p> 
+
+<h3>Operating Modes</h3> <i>Align</i> has two modes of operation,  Manual and Auto, which respectively challenges the user to try to find the optimal alignment, and demonstrates fully the selected algorithm and displays it's solution.<p> 
+A brief description: <dl> <dt><b>Manual Mode</b><dd>Using the mouse, the user can shift the sequences and create an alignment which the program will evaluate using the selected scheme. <dt><b>Auto Mode</b><dd>The program runs the selected algorithm and shows the resulting solution. This solution can be compared to the user's attempt. </dl> <p> 
+
+<h3>Manual Mode</h3> In Manual Mode the user manipulates the sequences to produce an alignment. Both sequences (source and target) may be manipulated, but the target should generally be shorter and more amenable to gaps.<p> 
+<b><i>Right-click</i> on a sequence letter to move it one space to the right, introducing a gap in its former slot.</b> <blockquote> Example:    &#160;  &#160;   <tt>ctat<font color="red">g</font>tcatg</tt>   &#160;&#8594;  &#160;<tt>ctat-gtcatg</tt> </blockquote><p> 
+<b><i>Left-click</i> on a sequence letter that is to the right of at least one gap to close the rightmost gap to the left.</b> <blockquote> Example:    &#160;  &#160;   <tt>c-tat-gt<font color="red">c</font>atg</tt>   &#160;&#8594;  &#160;<tt>c-tatgtcatg</tt> </blockquote><p> 
+<table border=0 cellwidth=2 cellpadding=2><tr ><td align="left"
+  valign="top" > <img src="fig1.jpg" align=left width="494" height="350"> </td>
+<td align="left" valign="top" >    &#160;  &#160;  &#160;  </td>
+<td align="left" valign="top" > <img src="fig1b.jpg" align=left
+  width="494" height="350"> </td>
+</tr>
+<tr ><td align="left" valign="top" ><font size=-1>Fig. 1a. Manual alignment</font></td>
+<td align="left" valign="top" ></td>
+<td align="left" valign="top" ><font size=-1>Fig. 1b. After evaluation</font> </td>
+</tr>
+</table>
+<p> 
+<b>Scoring</b> <br>
+ When you are satisfied click <i>Evaluate</i> to view the score your alignment gets in the chosen algorithm. The score values appear in a path in the matrix at the intersection of aligned letters (see Fig. 1b). Clicking on a score box allows you to see how the score value was obtained from the previous value, as prescribed by the algorithm and configuration settings.<p> 
+You can try additional alignments by clicking on sequence elements. You may first want to reset the sequence configuration by clicking the <i>Reset</i> button.<p> 
+<i>You may repeat this procedure as often as you like.</i><p> 
+
+<h3>Auto Mode</h3> In Auto Mode the program follows the selected algorithm to produce an alignment. After selecting Auto Mode <dl> <dt><b>Step</b><dd>performs a single step in the algorithm, filling in one box of the matrix; <dt><b>Solve</b><dd>completes the algorithm and shows the solution. If the <i>Animation</i> checkbox is checked, the display shows each step followed by a pause. The speed of the animation can be controlled by the Speed slider. An animation can be <i>Paused</i> and either <i>Continued</i> or <i>Restarted</i>. </dl>  Any filled box can be clicked to view the logic used to determine the value assigned to that box.<p> 
+If the Auto Mode procedure followed a Manual Mode evaluation, the two results can be compared by clicking the Manual and Auto radio buttons.<p> 
+<table border=0 cellwidth=2 cellpadding=2><tr ><td align="left"
+  valign="top" > <img src="fig2.jpg" align=left width="494" height="350"> </td>
+</tr>
+<tr ><td align="left" valign="top" ><font size=-1>Fig. 2. Midway through Auto evaluation</font> </td>
+</tr>
+</table>
+<p> 
+     
+<hr>
+<address></address> <p>
+</body>
+
+</html>

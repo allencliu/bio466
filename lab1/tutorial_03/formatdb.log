@@ -1,0 +1,10 @@
+
+========================[ Sep 12, 2023 10:21 AM ]========================
+Version 2.2.14 [May-07-2006]
+Started database file "/home/liuac/miami/fall2023/bio466/lab1/tutorial_03/454.adapter.fasta"
+NOTE: CoreLib [002.003] FileOpen(".formatdbrc","r") failed
+NOTE: CoreLib [002.003] FileOpen("/home/liuac/.formatdbrc","r") failed
+NOTE: [000.000] No number of link bits used found in config  file. Ignoring
+NOTE: [000.000] No number of membership bits used found in config file. Ignoring
+Formatted 27 sequences in volume 0
+SUCCESS: formatted database /home/liuac/miami/fall2023/bio466/lab1/tutorial_03/454.adapter.fasta

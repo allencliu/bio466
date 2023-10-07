@@ -1,0 +1,31 @@
+Vector databases are not indexed. Trying to index them now ...
+... ok
+
+* Using trimming files:
+ 
+/home/liuac/miami/fall2023/bio466/lab1/tutorial_03/454.adapter.fasta
+seqclean running options: 
+seqclean DRR000585.small.fasta -v 454.adapter.fasta
+ Standard log file: seqcl_DRR000585.small.fasta.log
+ Error log file:    err_seqcl_DRR000585.small.fasta.log
+ Using 1 CPUs for cleaning
+-= Rebuilding DRR000585.small.fasta cdb index =-
+ Launching actual cleaning process:
+ psx -p 1  -n 1000  -i DRR000585.small.fasta -d cleaning -C '/home/liuac/miami/fall2023/bio466/lab1/tutorial_03/DRR000585.small.fasta:ANLMS100:/home/liuac/miami/fall2023/bio466/lab1/tutorial_03/454.adapter.fasta::11:0' -c '/home/liuac/miami/fall2023/bio466/lab1/tutorial_04/seqclean-x86_64/bin/seqclean.psx'
+Collecting cleaning reports
+
+**************************************************
+Sequences analyzed:      2574
+-----------------------------------
+                   valid:      2414  (326 trimmed)
+                 trashed:       160
+**************************************************
+----= Trashing summary =------
+                by 'dust':        2
+              by 'shortq':      102
+               by 'short':       54
+            by 'low_qual':        2
+------------------------------
+Output file containing only valid and trimmed sequences: DRR000585.small.fasta.clean
+For trimming and trashing details see cleaning report  : DRR000585.small.fasta.cln
+--------------------------------------------------
