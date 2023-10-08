@@ -435,53 +435,225 @@ def translation(dna_sequence):
     'GGU': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'}
     rna_sequence = dna_sequence.replace('T', 'U')
     protein = []
-    result = " "
+    result = ""
     for i in range(0, len(rna_sequence)-2, 3):
         protein.append(trans_dic[rna_sequence[i:i+3]])
     result = result.join(protein)
     return result
     
 def translation_6_frame(dna_sequence):
-    """_summary_
+    """
+    Translate a DNA sequence in all six reading frames.
 
     Args:
-        dna_sequence (_type_): _description_
+        dna_sequence (str): The input DNA sequence to be translated.
+
+    Returns:
+        Tuple of six protein sequences (str): The protein sequences translated from the six reading frames.
     """
+    # Translate the original DNA sequence in the first reading frame
     protein_1 = translation(dna_sequence)
+
+    # Translate the DNA sequence shifted by one base to the right (second reading frame)
     protein_2 = translation(dna_sequence[1:])
+
+    # Translate the DNA sequence shifted by two bases to the right (third reading frame)
     protein_3 = translation(dna_sequence[2:])
+
+    # Calculate the reverse complement of the DNA sequence
     rev_comp = reverse_complement(dna_sequence)
+
+    # Translate the reverse complement in the first reading frame
     protein_4 = translation(rev_comp)
+
+    # Translate the reverse complement shifted by one base to the right (fifth reading frame)
     protein_5 = translation(rev_comp[1:])
+
+    # Translate the reverse complement shifted by two bases to the right (sixth reading frame)
     protein_6 = translation(rev_comp[2:])
-    return (protein_1, protein_2, protein_3, protein_4, protein_5, protein_6)
+
+    # Return a tuple containing the six protein sequences
+    return (protein_2, protein_3, protein_1, protein_4, protein_5, protein_6)
+
     
 def print_seq_fragment(seq_fragment, start, end):
+    """
+    Print a sequence fragment with annotations and translations.
+
+    Args:
+        seq_fragment (str): The sequence fragment to be printed.
+        start (int): The start index of the fragment in the original sequence.
+        end (int): The end index of the fragment in the original sequence.
+    """
+    # Calculate the length of the sequence fragment
     seq_length = end - start + 1
-    sequence = seq_fragment[start : end + 1]
+
+    # Extract the sequence from the fragment
+    sequence = seq_fragment[start: end + 1]
+
+    # Translate the sequence in all six reading frames
     proteins = translation_6_frame(sequence)
-    
-    print(proteins[0])
+
+    # Print the translations in the first three reading frames
+    for p in proteins[0:3]:
+        print(distribute_and_center_string(sequence, p))
+
+    # Print the original sequence
     print(sequence)
+
+    # Print a line of vertical bars to separate the annotations
     for i in range(seq_length):
         print("|", end="")
     print()
+
+    # Print a line with sequence range annotation
     print(
         f"<{start}{'-' * (end - start - len(str(start)) - len(str(end)) - 1)}{end}>"
     )
+
+    # Print another line of vertical bars
     for i in range(seq_length):
         print("|", end="")
     print()
 
-    # Print the sequence
-    print(reverse_complement(sequence)[::-1], end="\n\n")
+    # Print the reverse complement of the sequence
+    print(reverse_complement(sequence)[::-1], end="\n")
+
+    # Print the translations in the last three reading frames
+    for p in proteins[3:]:
+        print(distribute_and_center_string(sequence, p))
+
+    # Perform additional analysis on the sequence (assumes analysis function exists)
     analysis(sequence)
     
+def gene_analysis(gene_control, gene_target):
+    if int(gene_target) == 0 or int(gene_control) == 0:
+        return ":".join([gene_target, gene_control, "*"])
+    elif int(gene_target)/int(gene_control) >= 1.5:
+        return ":".join([gene_target, gene_control, "+"])
+    elif int(gene_target)/int(gene_control) < (2/3):
+        return ":".join([gene_target, gene_control, "-"])
+    else:
+        return ":".join([gene_target, gene_control, "."])
+    
+def get_expression(expression_file):
+    dict_lung = {}
+    dict_prostate = {}
+    fh = open(expression_file, "r")
+    fh.readline()
+    lines = fh.readlines()
+    for line in lines:
+        parts = line.split("\t")
+        dict_lung[parts[0]] = gene_analysis(parts[1], parts[2])
+        dict_prostate[parts[0]] = gene_analysis(parts[1], parts[3].strip())
+    return dict_lung, dict_prostate
 
+def print_gene_expression(dict_lung, dict_prostate):
+    print("1. Differentially expressed genes detected for lung cancer-control comparison:\n")
+    print("GeneID\tNumL:NumC:Exp")
+    for key in dict_lung:
+        print(f"{key} {dict_lung[key]}")
+    print("\n\n")
+    print("2. Differentially expressed genes detected for prostate cancer-control comparison:\n")
+    print("GeneID\tNumL:NumC:Exp")
+    for key in dict_prostate:
+        print(f"{key} {dict_prostate[key]}")
+    print()
+    
+def gene_compare(dict_lung, dict_prostate):
+    # Extract sets of genes based on expression values
+    genes_lung = {gene for gene, expression in dict_lung.items() if expression[-1] in ('+', '-')}
+    genes_prostate = {gene for gene, expression in dict_prostate.items() if expression[-1] in ('+', '-')}
+    
+    # Extract sets of genes that end in '*' or '.'
+    genes_lung_not_expressed = {gene for gene, expression in dict_lung.items() if expression[-1] in ('*', '.')}
+    genes_prostate_not_expressed = {gene for gene, expression in dict_prostate.items() if expression[-1] in ('*', '.')}
+    
+    # Genes expressed in both lung and prostate cancer
+    common_genes = sorted(list(genes_lung.intersection(genes_prostate)))
+
+    # Genes expressed only in lung cancer
+    lung_only_genes = sorted(list(genes_lung.difference(genes_prostate)))
+
+    # Genes expressed only in prostate cancer
+    prostate_only_genes = sorted(list(genes_prostate.difference(genes_lung)))
+
+    # Genes expressed in neither lung nor prostate cancer (not expressed in both)
+    neither_genes = sorted(list(genes_lung_not_expressed.intersection(genes_prostate_not_expressed)))
+
+    return common_genes, lung_only_genes, prostate_only_genes, neither_genes
+
+
+
+
+def print_gene_compare(common_genes, lung_only_genes, prostate_only_genes, neither_genes):
+    print("3. Four different groups of genes\n")
+    print("[3.1] The genes expressed in both lung and prostate cancer tissues.\n")
+    for gene in common_genes:
+        print(gene, end=" ")
+    print("\n")
+    print("[3.2] The genes expressed only in lung cancer tissues.\n")
+    for gene in lung_only_genes:
+        print(gene, end=" ")
+    print("\n")
+    print("[3.3] The genes expressed only in prostate cancer tissues.\n")
+    for gene in prostate_only_genes:
+        print(gene, end=" ")
+    print("\n")
+    print("[3.4] The genes expressed in neither lung nor prostate cancer tissues.\n")
+    for gene in neither_genes:
+        print(gene, end=" ")
+    print()
+    
+def distribute_and_center_string(string1, string2):
+    """
+    Distribute and center a string within another string with padding.
+
+    Args:
+        string1 (str): The target string to center within.
+        string2 (str): The string to be centered.
+
+    Returns:
+        str: The centered string.
+    """
+    # Calculate the total number of spaces needed to center string2 within string1
+    total_spaces = len(string1) - len(string2) + 1
+
+    # Calculate the number of spaces between characters to evenly distribute string2
+    num_spaces_between_chars = total_spaces // (len(string2) - 1)
+
+    # Initialize an empty string to store the distributed string
+    distributed_string2 = ""
+
+    # Iterate through the characters of string2 and add spaces between them
+    for i, char in enumerate(string2):
+        distributed_string2 += char
+        if i < len(string2) - 1:
+            distributed_string2 += " " * num_spaces_between_chars
+
+    # Calculate the number of spaces needed on each side to center the distributed string
+    total_padding_spaces = len(string1) - len(distributed_string2)
+    left_padding_spaces = total_padding_spaces // 2
+    right_padding_spaces = total_padding_spaces - left_padding_spaces
+
+    # Create the final centered string with padding
+    centered_string2 = " " * left_padding_spaces + distributed_string2 + " " * right_padding_spaces
+
+    return centered_string2
+
+    
 def analysis(sequence):
-    # Perform various analyses based on configuration settings.
+    """
+    Perform various sequence analyses based on configuration settings.
+
+    Args:
+        sequence (str): The input sequence to be analyzed.
+    """
+    # Check if nucleotide counting is enabled in the configuration settings
     if config_dict["nucleotideCounter[Y|N]"] == "Y":
+        # Calculate nucleotide counts
         n_tides = nucleotide_counter(sequence)
+        # Print the nucleotide counts
         print(
             "Nucleotide Counts:",
             f"Seq Length={n_tides[0]}",
@@ -492,27 +664,39 @@ def analysis(sequence):
             f"N={n_tides[5]}",
         )
 
+    # Check if GC content calculation is enabled in the configuration settings
     if config_dict["gcContent[Y|N]"] == "Y":
+        # Calculate GC content and round it to two decimal places
         gc_cont = gc_content(sequence)
+        # Print the GC content as a percentage
         print(f"GC Content={round(gc_cont * 100, 2)}%")
 
+    # Check if dinucleotide profile calculation is enabled in the configuration settings
     if config_dict["dinucleotideProfil[Y|N]"] == "Y":
-        print("Dinucleotide profile: ", end="")
+        # Calculate the dinucleotide profile
         di_profile = di_nucleotide_profile(sequence)
+        # Print the dinucleotide profile
+        print("Dinucleotide profile: ", end="")
         for dinucleotide in di_profile:
             print(f"{dinucleotide}={di_profile[dinucleotide]}", end=" ")
         print()
 
+    # Check if CpG island prediction is enabled in the configuration settings
     if config_dict["CpGIsland[Y|N]"] == "Y":
-        print("CpG Islands: ", end="")
+        # Predict CpG islands
         cpg = cpg_island(sequence)
+        # Print CpG islands
+        print("CpG Islands: ", end="")
         for key in cpg:
             print("".join([str(key), "=", cpg[key]]), end=" ")
         print("\n")
-        
+
+    # Check if codon profile calculation is enabled in the configuration settings
     if "codonProfile[Y|N]" in config_dict and config_dict["codonProfile[Y|N]"] == "Y":
-        codon_profile_print(codon_profile(sequence))      
-        
+        # Calculate codon profile
+        codon_profile_print(codon_profile(sequence))
+    
+    
 
 def inquiry(config_dict, fasta_list):
     """Perform various analyses on selected sequences based on configuration settings.
@@ -637,3 +821,8 @@ if __name__ == "__main__":
 
     # Inquiry Mode
     inquiry(config_dict, fasta_list)
+    
+    dict_lung, dict_prostate = get_expression(config_dict["GeneExpFileName"])
+    print_gene_expression(dict_lung, dict_prostate)
+    common_genes, lung_only_genes, prostate_only_genes, neither_genes = gene_compare(dict_lung, dict_prostate)
+    print_gene_compare(common_genes, lung_only_genes, prostate_only_genes, neither_genes)
