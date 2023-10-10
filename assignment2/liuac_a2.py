@@ -531,7 +531,6 @@ def translation_6_frame(dna_sequence):
 
     # Calculate the reverse complement of the DNA sequence
     rev_comp = reverse_complement(dna_sequence)
-
     # Translate the reverse complement in the first reading frame
     protein_4 = translation(rev_comp)
 
@@ -542,7 +541,7 @@ def translation_6_frame(dna_sequence):
     protein_6 = translation(rev_comp[2:])
 
     # Return a tuple containing the six protein sequences
-    return (protein_2, protein_3, protein_1, protein_4, protein_5, protein_6)
+    return (protein_1, protein_2, protein_3, protein_6[::-1], protein_5[::-1], protein_4[::-1])
 
 
 def print_seq_fragment(seq_fragment, start, end):
@@ -554,21 +553,22 @@ def print_seq_fragment(seq_fragment, start, end):
         start (int): The start index of the fragment in the original sequence.
         end (int): The end index of the fragment in the original sequence.
     """
+    
     # Calculate the length of the sequence fragment
     seq_length = end - start + 1
 
     # Extract the sequence from the fragment
-    sequence = seq_fragment[start : end + 1]
+    sequence = seq_fragment[start - 1 : end]
 
     # Translate the sequence in all six reading frames
     proteins = translation_6_frame(sequence)
 
     # Print the translations in the first three reading frames
-    for p in proteins[0:3]:
+    for p in proteins[3:]:
         print(format_seq_frag(sequence, p))
 
-    # Print the original sequence
-    print(sequence)
+    # Print the reverse complement of the sequence
+    print(reverse_complement(sequence)[::-1], end="\n")
 
     # Print a line of vertical bars to separate the annotations
     for i in range(seq_length):
@@ -583,11 +583,11 @@ def print_seq_fragment(seq_fragment, start, end):
         print("|", end="")
     print()
 
-    # Print the reverse complement of the sequence
-    print(reverse_complement(sequence)[::-1], end="\n")
-
+    # Print the original sequence
+    print(sequence)
+    
     # Print the translations in the last three reading frames
-    for p in proteins[3:]:
+    for p in proteins[0:3]:
         print(format_seq_frag(sequence, p))
     print()
     
@@ -715,22 +715,22 @@ def gene_compare(dict_lung, dict_prostate):
     """
     # Extract sets of genes based on expression values
     genes_lung = {
-        gene for gene, expression in dict_lung.items() if expression[-1] in ("+", "-")
+        gene for gene, expression in dict_lung.items() if int(expression.split(":")[0]) > 0
     }
     genes_prostate = {
         gene
         for gene, expression in dict_prostate.items()
-        if expression[-1] in ("+", "-")
+        if int(expression.split(":")[0]) > 0
     }
 
     # Extract sets of genes that end in '*' or '.'
     genes_lung_not_expressed = {
-        gene for gene, expression in dict_lung.items() if expression[-1] in ("*", ".")
+        gene for gene, expression in dict_lung.items() if int(expression.split(":")[0]) == 0
     }
     genes_prostate_not_expressed = {
         gene
         for gene, expression in dict_prostate.items()
-        if expression[-1] in ("*", ".")
+        if int(expression.split(":")[0]) == 0
     }
 
     # Genes expressed in both lung and prostate cancer
@@ -916,7 +916,7 @@ def inquiry(config_dict, fasta_list):
             # Extract the sequence fragment.
             sequence = fasta_list[2][seq][start : end + 1]
 
-            print(f">{fasta_list[0][seq]}", end="\n\n")
+            print(f">{fasta_list[0][seq]} {fasta_list[1][seq]}", end="\n\n")
             print(
                 f"The selected fragment has a length of {seq_length} nucleotides:",
                 end="\n\n",
@@ -1017,3 +1017,7 @@ if __name__ == "__main__":
     print_gene_compare(
         common_genes, lung_only_genes, prostate_only_genes, neither_genes
     )
+
+# TA's expected output is from 57-99, technically 57-98 because 99th character is excluded;
+# in the config profile, it's asking for 58-99, which should be 58-100 because the 100th character is excluded
+# print("CCTGCCGCCGCGGGCGCGCATGCGCCCCGGCCCGTACTGGCCGGTGGTGCACCCGGCTGCGGGATCACCTCCGACACCCCGAGCGGGCCCGGGTTTTCACGTGCCTGGTCCCGCCACGCCCACCACATCTGGCGGAAAAA"[57:99])
