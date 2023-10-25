@@ -1,0 +1,14 @@
+RNAName,GeneName,Patient1,Patient2,Patient3
+isoform1,gene1,30,40,50
+isoform2,gene1,0,10,20
+isoform3,gene1,100,5,60
+isoform4,gene2,35,88,99
+isoform5,gene3,0,1000,5
+isoform6,gene3,66,2000,45
+isoform7,gene4,37,123,9
+isoform8,gene5,0,1000,5
+isoform9,gene6,66,2000,45
+isoform10,gene7,37,123,9
+isoform11,gene7,0,0,99
+isoform12,gene7,7,1,37
+isoform13,gene7,23,8,25
