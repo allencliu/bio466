@@ -1,4 +1,4 @@
-import re
+import regex
 from sys import argv
 from NeedlemanWunsch_class_updated import Needleman_Wunsch
 
@@ -830,12 +830,21 @@ def detect_homopolymer(sequence):
     homopolymers = []  # List to store detected homopolymers
 
     for nuc in ['A', 'T', 'G', 'C']:
-        pattern = f"{nuc}{nuc}{nuc}(?:{nuc}[^{nuc}]{{0,1}}){{4,}}{nuc}{nuc}{nuc}"
-        for match in re.finditer(pattern, sequence):
+        # pattern = f"{nuc}{{3}}(?:{nuc}[^{nuc}]{{0,1}}){{4}}{nuc}{{3}}"
+        
+        pattern = r"({nuc}{3,}{nuc}{s<=1}{nuc}{3,})"
+        pattern = pattern.replace("{nuc}", nuc)  # Replace the placeholder with the nucleotide
+
+        regex_pattern = regex.compile(pattern)
+        for match in regex_pattern.finditer(sequence):
             start = match.start()
             end = match.end() - 1  # Adjust the end position
             length = end - start + 1
-            homopolymers.append(f"{nuc} {start} {end + 1} {length}")
+            match_count = match.group(0).count(nuc)  # Count the occurrences of the nucleotide in the match
+            if match_count >= 10:  # Check if the homopolymer length is at least 10
+                match_count = match.group(0).count(nuc)  # Count the occurrences of the nucleotide in the match
+                # print(match_count)
+                homopolymers.append(f'{nuc}-{start}_{end} {length}')
 
     return homopolymers
 
@@ -965,13 +974,14 @@ def alignment(seq_name_list, seq_list):
     for i in range(1, len(seq_list)):
         aligner = Needleman_Wunsch(first_sequence, seq_list[i])
         aligned_seq1, aligned_seq2 = aligner.give_final_result()
-        aligned_seq1 = seq_name_list[0] + " " + aligned_seq1
-        aligned_seq2 = seq_name_list[0] + " " + aligned_seq2
+        aligned_seq1 = seq_name_list[0] + "\t" + aligned_seq1
+        aligned_seq2 = seq_name_list[0] + "\t" + aligned_seq2
         # Call the process_aligned_seq function to print alignments and CIGAR string
         process_aligned_seq(aligned_seq1, aligned_seq2)
 
 def process_aligned_seq(aligned_seq1, aligned_seq2):
     print(aligned_seq1)
+    print(aligned_seq2)
     # Initialize variables for match, mismatch, insertion, and deletion counts
     match_count = 0
     mismatch_count = 0
@@ -1068,8 +1078,8 @@ def analysis(sequence):
         # Calculate codon profile
         codon_profile_print(codon_profile(sequence))
         
-    # if "homopolymerSearch[Y|N]" in config_dict and config_dict["homopolymerSearch[Y|N]"] == "Y":
-    #     print(detect_homopolymer(sequence))
+    if "homopolymerSearch[Y|N]" in config_dict and config_dict["homopolymerSearch[Y|N]"] == "Y":
+        print(detect_homopolymer(sequence))
     
     if "motifSearch[Y|N]" in config_dict and config_dict["motifSearch[Y|N]"] == "Y":
         motifs = motif_search(sequence, config_dict["motifSearchTarget"])

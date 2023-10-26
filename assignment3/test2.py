@@ -59,12 +59,16 @@ def alignment(seq_name_list, seq_list):
     for i in range(1, len(seq_list)):
         aligner = Needleman_Wunsch(first_sequence, seq_list[i])
         aligned_seq1, aligned_seq2 = aligner.give_final_result()
-        aligned_seq1 = seq_name_list[0] + " " + aligned_seq1
-        aligned_seq2 = seq_name_list[0] + " " + aligned_seq2
+        aligned_seq1 = seq_name_list[0] + "\t" + aligned_seq1
+        aligned_seq2 = seq_name_list[i] + "\t" + aligned_seq2
         # Call the process_aligned_seq function to print alignments and CIGAR string
         process_aligned_seq(aligned_seq1, aligned_seq2)
 
-def process_aligned_seq(seq_name1, seq_name2, aligned_seq1, aligned_seq2):
+def process_aligned_seq(aligned_seq1, aligned_seq2):
+    print(aligned_seq1)
+    print(aligned_seq2)
+    
+    
     # Initialize variables for match, mismatch, insertion, and deletion counts
     match_count = 0
     mismatch_count = 0
@@ -91,8 +95,8 @@ def process_aligned_seq(seq_name1, seq_name2, aligned_seq1, aligned_seq2):
                 cigar_string += "D"
         else:
             mismatch_count += 1
-            alignment_line += "."  # Mismatch symbol
-            cigar_string += "X"
+            alignment_line += " "  # Mismatch symbol
+            cigar_string += "M"
 
     # Calculate match, mismatch, insertion, and deletion ratios
     total_length = len(aligned_seq1)
@@ -100,16 +104,7 @@ def process_aligned_seq(seq_name1, seq_name2, aligned_seq1, aligned_seq2):
     mismatch_ratio = mismatch_count / total_length
     insertion_ratio = insertion_count / total_length
     deletion_ratio = deletion_count / total_length
-
-    # Print alignment-related information
-    print(f"Alignment between {seq_name1} and {seq_name2}:")
-    print(f"Alignment Line: {alignment_line}")
-    print(f"CIGAR String: {cigar_string}")
-    print(f"Match Ratio: {match_ratio:.2f}")
-    print(f"Mismatch Ratio: {mismatch_ratio:.2f}")
-    print(f"Insertion Ratio: {insertion_ratio:.2f}")
-    print(f"Deletion Ratio: {deletion_ratio:.2f}")
-    print()
+    print(alignment_line)
 
 # Example usage:
 sequence_names = ["Seq1", "Seq2", "Seq3"]
