@@ -1017,7 +1017,3 @@ if __name__ == "__main__":
     print_gene_compare(
         common_genes, lung_only_genes, prostate_only_genes, neither_genes
     )
-
-# TA's expected output is from 57-99, technically 57-98 because 99th character is excluded;
-# in the config profile, it's asking for 58-99, which should be 58-100 because the 100th character is excluded
-# print("CCTGCCGCCGCGGGCGCGCATGCGCCCCGGCCCGTACTGGCCGGTGGTGCACCCGGCTGCGGGATCACCTCCGACACCCCGAGCGGGCCCGGGTTTTCACGTGCCTGGTCCCGCCACGCCCACCACATCTGGCGGAAAAA"[57:99])

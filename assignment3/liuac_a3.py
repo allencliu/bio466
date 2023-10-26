@@ -1,5 +1,6 @@
+import re
 from sys import argv
-
+from NeedlemanWunsch_class_updated import Needleman_Wunsch
 
 def parse_config_file(filename):
     """Parses a configuration file and returns a dictionary of key-value pairs.
@@ -590,9 +591,6 @@ def print_seq_fragment(seq_fragment, start, end):
     for p in proteins[0:3]:
         print(format_seq_frag(sequence, p))
     print()
-    
-    # Perform additional analysis on the sequence (assumes analysis function exists)
-    analysis(sequence)
 
 
 def gene_analysis(gene_control, gene_target):
@@ -826,7 +824,196 @@ def format_seq_frag(sequence, protein):
 
     return centered_protein
 
+# Assignment 3
+# -------------------------------------------------------------------------------------------------------------------------------------------
+def detect_homopolymer(sequence):
+    homopolymers = []  # List to store detected homopolymers
 
+    for nuc in ['A', 'T', 'G', 'C']:
+        pattern = f"{nuc}{nuc}{nuc}(?:{nuc}[^{nuc}]{{0,1}}){{4,}}{nuc}{nuc}{nuc}"
+        for match in re.finditer(pattern, sequence):
+            start = match.start()
+            end = match.end() - 1  # Adjust the end position
+            length = end - start + 1
+            homopolymers.append(f"{nuc} {start} {end + 1} {length}")
+
+    return homopolymers
+
+def motif_search(sequence, target):
+    detected_motifs = []
+    seq_len = len(sequence)
+    target_len = len(target)
+    i = 0
+
+    while i < seq_len:
+        if sequence[i:i + target_len] == target:
+            start_pos = i 
+            end_pos = i + target_len - 1
+            motif_length = target_len
+            detected_motifs.append(f"{start_pos}-{end_pos}_{motif_length}")
+            i += target_len
+        else:
+            i += 1
+
+    return detected_motifs
+
+# Helper method for print_targets
+def modify_sequence(sequence, motifs):
+    modified_sequence = list(sequence)  # Convert the sequence to a list of characters for easy modification
+
+    for motif_info in motifs:
+        start_end, length = motif_info.split('_')
+        start, end = map(int, start_end.split('-'))
+
+        for i in range(start, end + 1):
+            modified_sequence[i] = sequence[i].lower()
+
+    return ''.join(modified_sequence)  # Convert the modified list back to a string
+
+def print_with_ruler2(sequence, NucleotidesPerLine, spacer):
+    """Prints sequence information with a ruler.
+
+    Args:
+        seq_name (str): The name of the sequence.
+        description (str): The description or additional information about the sequence.
+        sequence (str): The sequence bases.
+        NucleotidesPerLine (int): The maximum number of nucleotides to print per line.
+        spacer (bool): A flag indicating whether to add spaces between nucleotides.
+    """
+    if (
+        spacer == False
+    ):  # If spacer is set to False, do not add spaces between nucleotides.
+        repeat_count = NucleotidesPerLine // 10
+
+        # Generate a string of repeated digits from 1 to 10 (0) based on repeat_count.
+        repeated_string = "".join(["1234567890"] * repeat_count)
+
+        # Create a line header with numbers and spaces.
+        line_header = " ".join(["Line", repeated_string])
+
+        # Print the header row with line numbers and ruler.
+        print(f"{1 :> 15}", end="")  # Print the first line number.
+        for k in range(repeat_count - 1):
+            print(f"{k + 2 :> 10}", end="")  # Print subsequent line numbers.
+        print()  # Move to the next line.
+        print(line_header)  # Print the ruler.
+
+        # Print the sequence with line numbers and without spaces.
+        for i in range(0, len(sequence), NucleotidesPerLine):
+            chunk = sequence[i : i + NucleotidesPerLine]
+
+            # Remove spaces between every 10 characters in the chunk.
+            chunk_without_spaces = "".join(
+                [chunk[j : j + 10] for j in range(0, len(chunk), 10)]
+            )
+
+            # Print the line number and sequence chunk.
+            print(f"{i // NucleotidesPerLine + 1 :> 4}", chunk_without_spaces)
+    else:
+        repeat_count = NucleotidesPerLine // 10
+
+        # Generate a string of repeated digits from 1 to 10 (0 based on repeat_count.
+        repeated_string = " ".join(["1234567890"] * repeat_count)
+
+        # Create a line header with numbers and spaces.
+        line_header = " ".join(["Line", repeated_string])
+
+        # Print the header row with line numbers and ruler.
+        print(f"{1 :> 15}", end="")  # Print the first line number.
+        for k in range(repeat_count - 1):
+            print(
+                f"{k + 2 :> 11}", end=""
+            )  # Print subsequent line numbers with extra spacing.
+        print()  # Move to the next line.
+        print(line_header)  # Print the ruler.
+
+        # Print the sequence with line numbers and spaces.
+        for i in range(0, len(sequence), NucleotidesPerLine):
+            chunk = sequence[i : i + NucleotidesPerLine]
+
+            # Add spaces between every 10 characters in the chunk.
+            chunk_with_spaces = " ".join(
+                [chunk[j : j + 10] for j in range(0, len(chunk), 10)]
+            )
+
+            # Print the line number and sequence chunk.
+            print(f"{i // NucleotidesPerLine + 1 :> 4}", chunk_with_spaces)
+
+
+def print_targets(sequence, list_homo, list_motif):
+    new_sequence = modify_sequence(sequence, list_motif)
+    print(f"Motif Search for {config_dict['motifSearchTarget']}:", end=" ")
+    for idx, motif in enumerate(list_motif, start=1):
+        print(f"{idx}={motif}", end=" ")
+    print("\n")
+    print_with_ruler2(new_sequence, int(config_dict["NucleotidesPerLine[50|100]"]), config_dict["DoYouNeedSpaceSeperator[Y|N]"] == "Y")
+    # for i in range(len(fasta_list[0])):
+    #         group = fasta_list[0][i], fasta_list[1][i], new_sequence
+    #         print_with_ruler(
+    #             *group, int(config_dict["NucleotidesPerLine[50|100]"]), True
+    #         )
+    
+def alignment(seq_name_list, seq_list):
+    # Ensure there are at least two sequences for alignment
+    if len(seq_list) < 2:
+        print("At least two sequences are required for alignment.")
+        return
+
+    # Define the NeedlemanWunsch object for sequence alignment
+    # Align the first sequence with all other sequences
+    first_sequence = seq_list[0]
+    for i in range(1, len(seq_list)):
+        aligner = Needleman_Wunsch(first_sequence, seq_list[i])
+        aligned_seq1, aligned_seq2 = aligner.give_final_result()
+        aligned_seq1 = seq_name_list[0] + " " + aligned_seq1
+        aligned_seq2 = seq_name_list[0] + " " + aligned_seq2
+        # Call the process_aligned_seq function to print alignments and CIGAR string
+        process_aligned_seq(aligned_seq1, aligned_seq2)
+
+def process_aligned_seq(aligned_seq1, aligned_seq2):
+    print(aligned_seq1)
+    # Initialize variables for match, mismatch, insertion, and deletion counts
+    match_count = 0
+    mismatch_count = 0
+    insertion_count = 0
+    deletion_count = 0
+
+    alignment_line = ""  # Initialize the middle line of the alignment
+    cigar_string = ""    # Initialize the CIGAR string
+
+    # Calculate match, mismatch, insertion, and deletion counts
+    for char1, char2 in zip(aligned_seq1, aligned_seq2):
+        if char1 == char2:
+            match_count += 1
+            alignment_line += "|"  # Match symbol
+            cigar_string += "M"
+        elif char1 == '-' or char2 == '-':
+            if char1 == '-':
+                insertion_count += 1
+                alignment_line += " "  # Insertion symbol
+                cigar_string += "I"
+            else:
+                deletion_count += 1
+                alignment_line += " "  # Deletion symbol
+                cigar_string += "D"
+        else:
+            mismatch_count += 1
+            alignment_line += "."  # Mismatch symbol
+            cigar_string += "X"
+
+    # Calculate match, mismatch, insertion, and deletion ratios
+    total_length = len(aligned_seq1)
+    match_ratio = match_count / total_length
+    mismatch_ratio = mismatch_count / total_length
+    insertion_ratio = insertion_count / total_length
+    deletion_ratio = deletion_count / total_length
+
+
+
+    
+
+# Analysis and Inquiry
+# -------------------------------------------------------------------------------------------------------------------------------------------
 def analysis(sequence):
     """
     Perform various sequence analyses based on configuration settings.
@@ -880,6 +1067,15 @@ def analysis(sequence):
     if "codonProfile[Y|N]" in config_dict and config_dict["codonProfile[Y|N]"] == "Y":
         # Calculate codon profile
         codon_profile_print(codon_profile(sequence))
+        
+    # if "homopolymerSearch[Y|N]" in config_dict and config_dict["homopolymerSearch[Y|N]"] == "Y":
+    #     print(detect_homopolymer(sequence))
+    
+    if "motifSearch[Y|N]" in config_dict and config_dict["motifSearch[Y|N]"] == "Y":
+        motifs = motif_search(sequence, config_dict["motifSearchTarget"])
+        print_targets(sequence, None, motifs )
+        print()
+        # print(config_dict["motifSearchTarget"])
 
 
 def inquiry(config_dict, fasta_list):
@@ -890,6 +1086,8 @@ def inquiry(config_dict, fasta_list):
         fasta_list (tuple): A tuple containing sequence data (names, descriptions, and sequences).
 
     """
+    seq_name_list = []
+    seq_list = []
     # Extract selected sequence indices and fragment start and end positions from config_dict.
     selected = [int(x) for x in config_dict["SelectedSeqs"].split(",")]
     start = int(config_dict["SeqFragmentStartPosition"])
@@ -915,18 +1113,18 @@ def inquiry(config_dict, fasta_list):
         else:
             # Extract the sequence fragment.
             sequence = fasta_list[2][seq][start : end + 1]
+            
+            # Add sequence name and sequence to the lists
+            seq_name_list.append(fasta_list[0][seq])
+            seq_list.append(sequence)
 
             print(f">{fasta_list[0][seq]} {fasta_list[1][seq]}", end="\n\n")
             print(
                 f"The selected fragment has a length of {seq_length} nucleotides:",
                 end="\n\n",
             )
-
-            if (
-                "translation6Frames[Y|N]" in config_dict
-                and config_dict["translation6Frames[Y|N]"] == "Y"
-            ):
-                print_seq_fragment(fasta_list[2][seq], start, end)
+            if "translation6Frames[Y|N]" in config_dict and config_dict["translation6Frames[Y|N]"] == "Y":
+                    print_seq_fragment(fasta_list[2][seq], start, end)
             else:
                 # Print a representation of the sequence fragment with start and end markers.
                 print(
@@ -938,7 +1136,11 @@ def inquiry(config_dict, fasta_list):
 
                 # Print the sequence
                 print(sequence, end="\n\n")
-                analysis(sequence)
+            analysis(sequence)
+    if "alignment[Y|N]" in config_dict and config_dict["alignment[Y|N]"] == "Y":
+                # print(seq_list)
+                # print(seq_name_list)
+                alignment(seq_name_list, seq_list)
 
 
 if __name__ == "__main__":
@@ -952,6 +1154,7 @@ if __name__ == "__main__":
 
     # Read in the FASTA file containing sequence data.
     fasta_file = config_dict["SeqFileName"]
+    global fasta_list
     fasta_list = read_fasta(fasta_file)
 
     # Display Mode
@@ -1017,7 +1220,3 @@ if __name__ == "__main__":
     print_gene_compare(
         common_genes, lung_only_genes, prostate_only_genes, neither_genes
     )
-
-# TA's expected output is from 57-99, technically 57-98 because 99th character is excluded;
-# in the config profile, it's asking for 58-99, which should be 58-100 because the 100th character is excluded
-# print("CCTGCCGCCGCGGGCGCGCATGCGCCCCGGCCCGTACTGGCCGGTGGTGCACCCGGCTGCGGGATCACCTCCGACACCCCGAGCGGGCCCGGGTTTTCACGTGCCTGGTCCCGCCACGCCCACCACATCTGGCGGAAAAA"[57:99])
