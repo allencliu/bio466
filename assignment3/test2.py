@@ -66,9 +66,6 @@ def alignment(seq_name_list, seq_list):
 
 def process_aligned_seq(aligned_seq1, aligned_seq2):
     print(aligned_seq1)
-    print(aligned_seq2)
-    
-    
     # Initialize variables for match, mismatch, insertion, and deletion counts
     match_count = 0
     mismatch_count = 0
@@ -78,25 +75,55 @@ def process_aligned_seq(aligned_seq1, aligned_seq2):
     alignment_line = ""  # Initialize the middle line of the alignment
     cigar_string = ""    # Initialize the CIGAR string
 
-    # Calculate match, mismatch, insertion, and deletion counts
+    # Calculate match, mismatch, insertion, and deletion counts and build the CIGAR string
+    current_operation = ""  # Track the current operation (M, I, D)
+    current_count = 0  # Track the current count of contiguous operations
+    
     for char1, char2 in zip(aligned_seq1, aligned_seq2):
         if char1 == char2:
             match_count += 1
             alignment_line += "|"  # Match symbol
-            cigar_string += "M"
-        elif char1 == '-' or char2 == '-':
-            if char1 == '-':
-                insertion_count += 1
-                alignment_line += " "  # Insertion symbol
-                cigar_string += "I"
+            if current_operation != "M":
+                if current_operation:
+                    cigar_string += str(current_count) + current_operation
+                current_operation = "M"
+                current_count = 1
             else:
-                deletion_count += 1
-                alignment_line += " "  # Deletion symbol
-                cigar_string += "D"
+                current_count += 1
+        elif char1 == '-':
+            insertion_count += 1
+            alignment_line += " "  # Insertion symbol
+            if current_operation != "I":
+                if current_operation:
+                    cigar_string += str(current_count) + current_operation
+                current_operation = "I"
+                current_count = 1
+            else:
+                current_count += 1
+        elif char2 == '-':
+            deletion_count += 1
+            alignment_line += " "  # Deletion symbol
+            if current_operation != "D":
+                if current_operation:
+                    cigar_string += str(current_count) + current_operation
+                current_operation = "D"
+                current_count = 1
+            else:
+                current_count += 1
         else:
             mismatch_count += 1
             alignment_line += " "  # Mismatch symbol
-            cigar_string += "M"
+            if current_operation != "M":
+                if current_operation:
+                    cigar_string += str(current_count) + current_operation
+                current_operation = "M"
+                current_count = 1
+            else:
+                current_count += 1
+
+    # Append the last operation to the CIGAR string
+    if current_operation:
+        cigar_string += str(current_count) + current_operation
 
     # Calculate match, mismatch, insertion, and deletion ratios
     total_length = len(aligned_seq1)
@@ -104,10 +131,22 @@ def process_aligned_seq(aligned_seq1, aligned_seq2):
     mismatch_ratio = mismatch_count / total_length
     insertion_ratio = insertion_count / total_length
     deletion_ratio = deletion_count / total_length
-    print(alignment_line)
+
+    alignment_spaces = len(aligned_seq1) * ' '
+    alignment_line = alignment_spaces + alignment_line
+    print(alignment_line[25:])
+    # print(f"{alignment_line[len(aligned_seq1):]}")
+    print(aligned_seq2)
+    print(f"Identities={match_count}/{total_length} ({match_ratio * 100:.1f}%)")
+    print(f"Similarity={(match_count + mismatch_count)}/{total_length} ({(match_count + mismatch_count) / total_length * 100:.1f}%)")
+    print(f"Gaps={insertion_count + deletion_count}/{total_length} ({(insertion_count + deletion_count) / total_length * 100:.1f}%)")
+    print(f"CIGAR = {cigar_string}")
+
+
 
 # Example usage:
-sequence_names = ["Seq1", "Seq2", "Seq3"]
-sequences = ["ACGT", "AGCT", "ACCG"]
+sequence_names = ["ENSEMBL008", "ENSEMBL009"]
+sequences = ["AGGATATAGATAAGATAGACCACCCATAGA", "AGGAATAGATAAGATAGACAGGCGTATA"]
 
-alignment(sequence_names, sequences)
+alignment(seq_name_list=sequence_names, seq_list=sequences)
+

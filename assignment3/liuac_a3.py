@@ -844,7 +844,7 @@ def detect_homopolymer(sequence):
             if match_count >= 10:  # Check if the homopolymer length is at least 10
                 match_count = match.group(0).count(nuc)  # Count the occurrences of the nucleotide in the match
                 # print(match_count)
-                homopolymers.append(f'{nuc}-{start}_{end} {length}')
+                homopolymers.append(f'{start}-{end}_{length}_{nuc}')
 
     return homopolymers
 
@@ -867,15 +867,24 @@ def motif_search(sequence, target):
     return detected_motifs
 
 # Helper method for print_targets
-def modify_sequence(sequence, motifs):
+def modify_sequence(sequence, homopolymers, motifs):
     modified_sequence = list(sequence)  # Convert the sequence to a list of characters for easy modification
 
-    for motif_info in motifs:
-        start_end, length = motif_info.split('_')
-        start, end = map(int, start_end.split('-'))
+    if motifs != None:
+        for motif_info in motifs:
+            start_end, length = motif_info.split('_')
+            start, end = map(int, start_end.split('-'))
 
-        for i in range(start, end + 1):
-            modified_sequence[i] = sequence[i].lower()
+            for i in range(start, end + 1):
+                modified_sequence[i] = sequence[i].lower()
+    
+    if homopolymers != None:
+        for homopolymer_info in homopolymers:
+            start_end, length, letter= homopolymer_info.split('_')
+            start, end = map(int, start_end.split('-'))
+
+            for i in range(start, end + 1):
+                modified_sequence[i] = sequence[i].lower()
 
     return ''.join(modified_sequence)  # Convert the modified list back to a string
 
@@ -950,17 +959,20 @@ def print_with_ruler2(sequence, NucleotidesPerLine, spacer):
 
 
 def print_targets(sequence, list_homo, list_motif):
-    new_sequence = modify_sequence(sequence, list_motif)
-    print(f"Motif Search for {config_dict['motifSearchTarget']}:", end=" ")
-    for idx, motif in enumerate(list_motif, start=1):
-        print(f"{idx}={motif}", end=" ")
-    print("\n")
+    new_sequence = modify_sequence(sequence, list_homo, list_motif)
+    if list_homo != None:
+        print(f"Homopolymer Search:", end=" ")
+        for idx, homopolymer in enumerate(list_homo, start=1):
+            print(f"{idx}={homopolymer}", end=" ")
+        print()
+    if list_motif != None:
+        print(f"Motif Search for {config_dict['motifSearchTarget']}:", end=" ")
+        for idx, motif in enumerate(list_motif, start=1):
+            print(f"{idx}={motif}", end=" ")
+        print()
+    print()
     print_with_ruler2(new_sequence, int(config_dict["NucleotidesPerLine[50|100]"]), config_dict["DoYouNeedSpaceSeperator[Y|N]"] == "Y")
-    # for i in range(len(fasta_list[0])):
-    #         group = fasta_list[0][i], fasta_list[1][i], new_sequence
-    #         print_with_ruler(
-    #             *group, int(config_dict["NucleotidesPerLine[50|100]"]), True
-    #         )
+    print()
     
 def alignment(seq_name_list, seq_list):
     # Ensure there are at least two sequences for alignment
@@ -1078,14 +1090,16 @@ def analysis(sequence):
         # Calculate codon profile
         codon_profile_print(codon_profile(sequence))
         
-    if "homopolymerSearch[Y|N]" in config_dict and config_dict["homopolymerSearch[Y|N]"] == "Y":
-        print(detect_homopolymer(sequence))
-    
-    if "motifSearch[Y|N]" in config_dict and config_dict["motifSearch[Y|N]"] == "Y":
+    if "homopolymerSearch[Y|N]" in config_dict and config_dict["homopolymerSearch[Y|N]"] == "Y" and "motifSearch[Y|N]" in config_dict and config_dict["motifSearch[Y|N]"] == "Y":
+        homopolymers = detect_homopolymer(sequence)
         motifs = motif_search(sequence, config_dict["motifSearchTarget"])
-        print_targets(sequence, None, motifs )
-        print()
-        # print(config_dict["motifSearchTarget"])
+        print_targets(sequence, homopolymers, motifs)
+    elif "homopolymerSearch[Y|N]" in config_dict and config_dict["homopolymerSearch[Y|N]"] == "Y" and "motifSearch[Y|N]" in config_dict and config_dict["motifSearch[Y|N]"] == "N":
+        homopolymers = detect_homopolymer(sequence)
+        print_targets(sequence, homopolymers, None)
+    elif "homopolymerSearch[Y|N]" in config_dict and config_dict["homopolymerSearch[Y|N]"] == "N" and "motifSearch[Y|N]" in config_dict and config_dict["motifSearch[Y|N]"] == "Y":
+        motifs = motif_search(sequence, config_dict["motifSearchTarget"])
+        print_targets(sequence, None, motifs)
 
 
 def inquiry(config_dict, fasta_list):
