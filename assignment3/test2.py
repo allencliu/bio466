@@ -65,12 +65,19 @@ def alignment(seq_name_list, seq_list):
         process_aligned_seq(aligned_seq1, aligned_seq2)
 
 def process_aligned_seq(aligned_seq1, aligned_seq2):
+    def is_pyrimidine(char):
+        return char in ('C', 'T')
+
+    def is_purine(char):
+        return char in ('A', 'G')
+    
     print(aligned_seq1)
     # Initialize variables for match, mismatch, insertion, and deletion counts
     match_count = 0
     mismatch_count = 0
     insertion_count = 0
     deletion_count = 0
+    pyr_pur_count = 0
 
     alignment_line = ""  # Initialize the middle line of the alignment
     cigar_string = ""    # Initialize the CIGAR string
@@ -79,7 +86,7 @@ def process_aligned_seq(aligned_seq1, aligned_seq2):
     current_operation = ""  # Track the current operation (M, I, D)
     current_count = 0  # Track the current count of contiguous operations
     
-    for char1, char2 in zip(aligned_seq1, aligned_seq2):
+    for char1, char2 in zip(aligned_seq1.split("\t")[1], aligned_seq2.split("\t")[1]):
         if char1 == char2:
             match_count += 1
             alignment_line += "|"  # Match symbol
@@ -111,8 +118,15 @@ def process_aligned_seq(aligned_seq1, aligned_seq2):
             else:
                 current_count += 1
         else:
+            if is_pyrimidine(char1) and is_pyrimidine(char2):
+                alignment_line += ":"  # Colon for pyrimidines
+                pyr_pur_count += 1
+            elif is_purine(char1) and is_purine(char2):
+                alignment_line += ":"  # Colon for purines
+                pyr_pur_count += 1
+            else:
+                alignment_line += " "  # Mismatch symbol
             mismatch_count += 1
-            alignment_line += " "  # Mismatch symbol
             if current_operation != "M":
                 if current_operation:
                     cigar_string += str(current_count) + current_operation
@@ -132,15 +146,15 @@ def process_aligned_seq(aligned_seq1, aligned_seq2):
     insertion_ratio = insertion_count / total_length
     deletion_ratio = deletion_count / total_length
 
-    alignment_spaces = len(aligned_seq1) * ' '
-    alignment_line = alignment_spaces + alignment_line
-    print(alignment_line[25:])
-    # print(f"{alignment_line[len(aligned_seq1):]}")
+    alignment_spaces = len(aligned_seq1.split("\t")[0]) * ' '
+    # print(len(alignment_spaces))
+    alignment_line = alignment_spaces + "\t" + alignment_line
+    print(alignment_line)
     print(aligned_seq2)
-    print(f"Identities={match_count}/{total_length} ({match_ratio * 100:.1f}%)")
-    print(f"Similarity={(match_count + mismatch_count)}/{total_length} ({(match_count + mismatch_count) / total_length * 100:.1f}%)")
-    print(f"Gaps={insertion_count + deletion_count}/{total_length} ({(insertion_count + deletion_count) / total_length * 100:.1f}%)")
-    print(f"CIGAR = {cigar_string}")
+    print(f"Identities={match_count}/{total_length} ({match_ratio * 100:.1f}%)", end= " ")
+    print(f"Similarity={(match_count + pyr_pur_count)}/{total_length} ({(match_count + pyr_pur_count) / total_length * 100:.1f}%)", end=" ")
+    print(f"Gaps={insertion_count + deletion_count}/{total_length} ({(insertion_count + deletion_count) / total_length * 100:.1f}%)", end=" ")
+    print(f"CIGAR = {cigar_string}", end="\n")
 
 
 

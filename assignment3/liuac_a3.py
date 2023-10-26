@@ -984,7 +984,7 @@ def alignment(seq_name_list, seq_list):
     # Align the first sequence with all other sequences
     first_sequence = seq_list[0]
     for i in range(1, len(seq_list)):
-        aligner = Needleman_Wunsch(first_sequence, seq_list[i])
+        aligner = Needleman_Wunsch(first_sequence, seq_list[i], int(config_dict["match"]), int(config_dict["mismatch"]), int(config_dict["gap"]))
         aligned_seq1, aligned_seq2 = aligner.give_final_result()
         aligned_seq1 = seq_name_list[0] + "\t" + aligned_seq1
         aligned_seq2 = seq_name_list[0] + "\t" + aligned_seq2
