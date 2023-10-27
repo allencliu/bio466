@@ -829,11 +829,17 @@ def format_seq_frag(sequence, protein):
 # Assignment 3
 # -------------------------------------------------------------------------------------------------------------------------------------------
 def detect_homopolymer(sequence):
+    """Detect homopolymer sequences in a DNA sequence.
+
+    Args:
+        sequence (str): The input DNA sequence to search for homopolymers.
+
+    Returns:
+        list: A list of homopolymer sequences in the format 'start-end_length_nucleotide'.
+    """
     homopolymers = []  # List to store detected homopolymers
 
-    for nuc in ['A', 'T', 'G', 'C']:
-        # pattern = f"{nuc}{{3}}(?:{nuc}[^{nuc}]{{0,1}}){{4}}{nuc}{{3}}"
-        
+    for nuc in ['A', 'T', 'G', 'C']:        
         pattern = r"({nuc}{3,}{nuc}{s<=1}{nuc}{3,})"
         pattern = pattern.replace("{nuc}", nuc)  # Replace the placeholder with the nucleotide
 
@@ -851,44 +857,66 @@ def detect_homopolymer(sequence):
     return homopolymers
 
 def motif_search(sequence, target):
-    detected_motifs = []
-    seq_len = len(sequence)
-    target_len = len(target)
-    i = 0
+    """Search for a target motif within a sequence and return the positions of detected motifs.
+
+    Args:
+        sequence (str): The input sequence to search for motifs.
+        target (str): The target motif to search for within the sequence.
+
+    Returns:
+        list: A list of motif positions in the format 'start-end_length' for each detected motif.
+    """
+    detected_motifs = []  # List to store detected motif positions
+    seq_len = len(sequence)  # Length of the input sequence
+    target_len = len(target)  # Length of the target motif
+    i = 0  # Initialize the index for iterating through the sequence
 
     while i < seq_len:
         if sequence[i:i + target_len] == target:
-            start_pos = i 
+            # If the current substring matches the target motif, record its position
+            start_pos = i
             end_pos = i + target_len - 1
             motif_length = target_len
             detected_motifs.append(f"{start_pos}-{end_pos}_{motif_length}")
-            i += target_len
+            i += target_len  # Skip the length of the motif to avoid overlapping detections
         else:
-            i += 1
+            i += 1  # Move to the next position in the sequence if no match is found
 
-    return detected_motifs
+    return detected_motifs  # Return the list of detected motif positions
+
 
 # Helper method for print_targets
 def modify_sequence(sequence, homopolymers, motifs):
+    """Modify a given DNA sequence by converting specified regions to lowercase letters.
+
+    Args:
+        sequence (str): The input DNA sequence to be modified.
+        homopolymers (list): A list of homopolymer information (start-end_length_letter) to be converted to lowercase.
+        motifs (list): A list of motif information (start-end_length) to be converted to lowercase.
+
+    Returns:
+        str: The modified DNA sequence with specified regions in lowercase.
+    """
     modified_sequence = list(sequence)  # Convert the sequence to a list of characters for easy modification
 
-    if motifs != None:
+    if motifs is not None:
         for motif_info in motifs:
             start_end, length = motif_info.split('_')
             start, end = map(int, start_end.split('-'))
 
             for i in range(start, end + 1):
                 modified_sequence[i] = sequence[i].lower()
-    
-    if homopolymers != None:
+
+    if homopolymers is not None:
         for homopolymer_info in homopolymers:
-            start_end, length, letter= homopolymer_info.split('_')
+            start_end, length, letter = homopolymer_info.split('_')
             start, end = map(int, start_end.split('-'))
 
             for i in range(start, end + 1):
                 modified_sequence[i] = sequence[i].lower()
 
     return ''.join(modified_sequence)  # Convert the modified list back to a string
+
 
 def print_with_ruler2(sequence, NucleotidesPerLine, spacer):
     """Prints sequence information with a ruler.
@@ -961,22 +989,39 @@ def print_with_ruler2(sequence, NucleotidesPerLine, spacer):
 
 
 def print_targets(sequence, list_homo, list_motif):
+    """Print detected homopolymers and motifs in a modified DNA sequence, along with the modified sequence.
+
+    Args:
+        sequence (str): The original DNA sequence.
+        list_homo (list): A list of detected homopolymers.
+        list_motif (list): A list of detected motifs.
+    """
     new_sequence = modify_sequence(sequence, list_homo, list_motif)
-    if list_homo != None:
+
+    if list_homo is not None:
         print(f"Homopolymer Search:", end=" ")
         for idx, homopolymer in enumerate(list_homo, start=1):
             print(f"{idx}={homopolymer}", end=" ")
         print()
-    if list_motif != None:
+
+    if list_motif is not None:
         print(f"Motif Search for {config_dict['motifSearchTarget']}:", end=" ")
         for idx, motif in enumerate(list_motif, start=1):
             print(f"{idx}={motif}", end=" ")
         print()
+
     print()
     print_with_ruler2(new_sequence, int(config_dict["NucleotidesPerLine[50|100]"]), config_dict["DoYouNeedSpaceSeperator[Y|N]"] == "Y")
     print()
+
     
 def alignment(seq_name_list, seq_list):
+    """Perform sequence alignment and print the results.
+
+    Args:
+        seq_name_list (list): A list of sequence names.
+        seq_list (list): A list of sequences to align.
+    """
     # Ensure there are at least two sequences for alignment
     if len(seq_list) < 2:
         print("At least two sequences are required for alignment.")
@@ -994,6 +1039,12 @@ def alignment(seq_name_list, seq_list):
         process_aligned_seq(aligned_seq1, aligned_seq2)
 
 def process_aligned_seq(aligned_seq1, aligned_seq2):
+    """Process and print alignment information between two aligned sequences.
+
+    Args:
+        aligned_seq1 (str): First aligned sequence with a sequence name.
+        aligned_seq2 (str): Second aligned sequence with a sequence name.
+    """
     def is_pyrimidine(char):
         return char in ('C', 'T')
 
@@ -1071,12 +1122,8 @@ def process_aligned_seq(aligned_seq1, aligned_seq2):
     # Calculate match, mismatch, insertion, and deletion ratios
     total_length = len(aligned_seq1)
     match_ratio = match_count / total_length
-    mismatch_ratio = mismatch_count / total_length
-    insertion_ratio = insertion_count / total_length
-    deletion_ratio = deletion_count / total_length
 
     alignment_spaces = len(aligned_seq1.split("\t")[0]) * ' '
-    # print(len(alignment_spaces))
     alignment_line = alignment_spaces + "\t" + alignment_line
     print(alignment_line)
     print(aligned_seq2, end="\n\n")
@@ -1086,7 +1133,16 @@ def process_aligned_seq(aligned_seq1, aligned_seq2):
     print(f"CIGAR = {cigar_string}", end="\n\n\n")
 
 def positional_matrix(seq_list):
-    # Get the length of the sequences and the alphabet size
+    """Generate a positional matrix to represent the distribution of nucleotides at each position in the sequences.
+
+    Args:
+        seq_list (list): A list of DNA sequences.
+
+    Returns:
+        numpy.ndarray: A positional matrix where each row represents a nucleotide (A, T, G, C)
+                      and each column represents a position in the sequences.
+    """
+    # Get the length of the sequences
     seq_length = len(seq_list[0])
     nucleotides = ['A', 'T', 'G', 'C']
     nucleotides_size = len(nucleotides)
@@ -1094,7 +1150,7 @@ def positional_matrix(seq_list):
     # Initialize an empty positional matrix filled with zeros
     pos_matrix = np.zeros((nucleotides_size, seq_length), dtype=int)
 
-    # Create a mapping from characters to column indices in the matrix
+    # Create a mapping from characters to row indices in the matrix
     char_to_index = {'A': 0, 'T': 1, 'G': 2, 'C': 3}
 
     # Iterate through the sequences character by character
@@ -1107,7 +1163,12 @@ def positional_matrix(seq_list):
     return pos_matrix
 
 def show_positional_matrix(my_array):
-    # Get the number of positions and alphabet size from the positional matrix
+    """Display and visualize a positional matrix, and save it as a stacked bar chart image.
+
+    Args:
+        my_array (numpy.ndarray): A positional matrix representing the distribution of nucleotides at each position.
+    """
+    # Get the number of positions from the positional matrix
     nucleotide_size, num_positions = my_array.shape
     left_align = len(str(num_positions))
 
@@ -1139,8 +1200,8 @@ def show_positional_matrix(my_array):
     # Calculate nucleotide percentages
     total_counts = np.sum(my_array, axis=0)
     percentages = (my_array / total_counts) * 100
-
     plt.figure(figsize=(16, 9))
+    
     # Plot a stacked bar graph
     positions = range(1, num_positions + 1)
     nucleotides = ['A', 'T', 'G', 'C']
@@ -1154,8 +1215,9 @@ def show_positional_matrix(my_array):
     plt.title('Positional Nucleotide Matrix')
     
     plt.yticks(range(0, 101, 10))
-    
+
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=4, frameon=False, borderaxespad=0.5)
+    
     # Save the stacked bar chart as a PNG file
     plt.savefig('PNM.jpg', format='JPG')
     
