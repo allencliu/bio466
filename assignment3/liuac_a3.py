@@ -2,6 +2,7 @@ import regex
 from sys import argv
 from NeedlemanWunsch_class_updated import Needleman_Wunsch
 import numpy as np
+import matplotlib.pyplot as plt
 
 def parse_config_file(filename):
     """Parses a configuration file and returns a dictionary of key-value pairs.
@@ -1153,6 +1154,7 @@ def show_positional_matrix(my_array):
     plt.title('Positional Nucleotide Matrix')
     
     plt.yticks(range(0, 101, 10))
+    
     plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=4, frameon=False, borderaxespad=0.5)
     # Save the stacked bar chart as a PNG file
     plt.savefig('PNM.jpg', format='JPG')
@@ -1291,7 +1293,8 @@ def inquiry(config_dict, fasta_list):
                 # print(seq_list)
                 # print(seq_name_list)
                 alignment(seq_name_list, seq_list)
-
+    if "PositionMatrix[Y|N]" in config_dict and config_dict["PositionMatrix[Y|N]"] == "Y":
+        show_positional_matrix(positional_matrix(seq_list))
 
 if __name__ == "__main__":
     """Main entry point for the script."""
