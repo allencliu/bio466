@@ -1,4 +1,7 @@
 from NeedlemanWunsch_class_updated import Needleman_Wunsch
+import numpy as np
+import matplotlib.pyplot as plt
+
 def motif_search(sequence, target):
     detected_motifs = []
     seq_len = len(sequence)
@@ -17,35 +20,17 @@ def motif_search(sequence, target):
 
     return detected_motifs
 
-# # Example usage
-# sequence = "ATGATGATGCATGGG"
-# target = "ATG"
-# motifs = motif_search(sequence, target)
+def modify_sequence(sequence, motifs):
+    modified_sequence = list(sequence)  # Convert the sequence to a list of characters for easy modification
 
-# # Print the detected motifs
-# for idx, motif_info in enumerate(motifs):
-#     print(f"Motif {idx + 1}: {motif_info}")
+    for motif_info in motifs:
+        start_end, length = motif_info.split('_')
+        start, end = map(int, start_end.split('-'))
 
-# def modify_sequence(sequence, motifs):
-#     modified_sequence = list(sequence)  # Convert the sequence to a list of characters for easy modification
+        for i in range(start, end + 1):
+            modified_sequence[i] = sequence[i].lower()
 
-#     for motif_info in motifs:
-#         start_end, length = motif_info.split('_')
-#         start, end = map(int, start_end.split('-'))
-
-#         for i in range(start, end + 1):
-#             modified_sequence[i] = sequence[i].lower()
-
-#     return ''.join(modified_sequence)  # Convert the modified list back to a string
-
-# # Example usage
-# sequence = "ATGCTACATGCATATGCAGTCAATGCATACCCATGGG"
-# motifs = motif_search(sequence, "ATG")
-
-# modified_sequence = modify_sequence(sequence, motifs)
-# print(modified_sequence)
-
-
+    return ''.join(modified_sequence)  # Convert the modified list back to a string
 
 def alignment(seq_name_list, seq_list):
     # Ensure there are at least two sequences for alignment
@@ -156,11 +141,91 @@ def process_aligned_seq(aligned_seq1, aligned_seq2):
     print(f"Gaps={insertion_count + deletion_count}/{total_length} ({(insertion_count + deletion_count) / total_length * 100:.1f}%)", end=" ")
     print(f"CIGAR = {cigar_string}", end="\n")
 
+def positional_matrix(seq_list):
+    # Get the length of the sequences and the alphabet size
+    seq_length = len(seq_list[0])
+    nucleotides = ['A', 'T', 'G', 'C']
+    nucleotides_size = len(nucleotides)
 
+    # Initialize an empty positional matrix filled with zeros
+    pos_matrix = np.zeros((nucleotides_size, seq_length), dtype=int)
 
-# Example usage:
-sequence_names = ["ENSEMBL008", "ENSEMBL009"]
-sequences = ["AGGATATAGATAAGATAGACCACCCATAGA", "AGGAATAGATAAGATAGACAGGCGTATA"]
+    # Create a mapping from characters to column indices in the matrix
+    char_to_index = {'A': 0, 'T': 1, 'G': 2, 'C': 3}
 
-alignment(seq_name_list=sequence_names, seq_list=sequences)
+    # Iterate through the sequences character by character
+    for sequence in seq_list:
+        for position, char in enumerate(sequence):
+            if char in char_to_index:
+                row_index = char_to_index[char]
+                pos_matrix[row_index, position] += 1
 
+    return pos_matrix
+
+def show_positional_matrix(my_array):
+    # Get the number of positions and alphabet size from the positional matrix
+    nucleotide_size, num_positions = my_array.shape
+    left_align = len(str(num_positions))
+
+    # Print position headers
+    print("Position", end=" ")
+    for i in range(1, num_positions + 1):
+        print("{: <{width}}".format(i, width=left_align), end=" ")
+    print()
+
+    # Print a line separator
+    print("--------", end=" ")
+    for i in range(num_positions):
+        print(f"{left_align * '-'}", end=" ")
+    print()
+
+    # Print the character counts for each nucleotide
+    nucleotides = ['A', 'T', 'G', 'C']
+    for row_index, nucleotide in enumerate(nucleotides):
+        print(nucleotide, end=f"{8 * ' '}")
+        for position in range(num_positions):
+            print(f"{my_array[row_index, position]}", end=f"{left_align * ' '}")
+        print()
+        
+        
+    
+    # Create a color map for nucleotides
+    colors = {'A': 'blue', 'T': 'red', 'G': 'gray', 'C': 'orange'}
+    
+    # Calculate nucleotide percentages
+    total_counts = np.sum(my_array, axis=0)
+    percentages = (my_array / total_counts) * 100
+
+    plt.figure(figsize=(16, 9))
+    # Plot a stacked bar graph
+    positions = range(1, num_positions + 1)
+    nucleotides = ['A', 'T', 'G', 'C']
+    bottom = np.zeros(num_positions)  # Initialize the bottom positions for stacking
+
+    for nucleotide in nucleotides:
+        counts = percentages[nucleotides.index(nucleotide)]
+        plt.bar(positions, counts, label=nucleotide, color=colors[nucleotide], bottom=bottom)
+        bottom += counts
+
+    plt.title('Positional Nucleotide Matrix')
+    
+    plt.yticks(range(0, 101, 10))
+    plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.05), ncol=4, frameon=False, borderaxespad=0.5)
+    # Save the stacked bar chart as a PNG file
+    plt.savefig('PNM.jpg', format='JPG')
+
+if __name__ == "__main__":
+    
+    # Example usage:
+    # sequence_names = ["ENSEMBL008", "ENSEMBL009"]
+    # sequences = ["AGGATATAGATAAGATAGACCACCCATAGA", "AGGAATAGATAAGATAGACAGGCGTATA"]
+
+    # alignment(seq_name_list=sequence_names, seq_list=sequences)
+    # Example usage:
+    sequences = ["TGTCCAACGGGCCGAGGTTGTCTCTTTCGAGATCTTGTCGCGGGGGGGGGCTGCCTGTG",
+                 "AGTGCGGGTCACAGATGCCTCGCACCCCTCCCCCGACAATGTGGCCCGTATGGAGGGTC",
+                 "CCTGCCGCCGCGGGCGCGCATGCGCCCCGGCCCGTACTGGCCGGTGGTGCACCCGGCTG",
+                 "CCGACACCCCGAGCGGGCCCGGGTTTTCACGTGCCTGGTCCCGCCACGCCCACCACATC"]
+    result = positional_matrix(sequences)
+    # print(result)
+    show_positional_matrix(result)
